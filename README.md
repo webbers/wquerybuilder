@@ -1,5 +1,5 @@
-# WQueryBuilder - A good alternative to create SQL strings using a browser
-=============
+# WQueryBuilder
+A good alternative to create SQL strings using a browser
 
 ## Features
 
