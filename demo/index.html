@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>jQuery WQueryBuilder</title>
+        <link href="../dist/jquery.wquerybuilder.css" media="all" rel="stylesheet" type="text/css">
+        <style>
+            body {
+                padding: 0 30px;
+                background: #EFEFEF;
+                font-family:Arial;
+                font-size: 14px;
+            }
+            .warning {
+                background: red;
+                color: #FFF;
+                font-weight: bold;
+                padding: 30px
+            }
+        </style>
+        
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+		<script src="../dist/squel.min.js"></script>
+        <script src="../dist/underscore-min.js"></script>
+        <script src="../dist/jquery.wquerybuilder.js"></script>
+        
+	</head>
+	<body>
+        <h1>jQuery WQueryBuilder</h1>
+        <small>Just a good way to create yours SQL strings</small>
+        <p class="warning">NOTE: It is recommended that you do NOT create queries browser-side to run on the
+        server as this massively increases your exposure to <a href="http://en.wikipedia.org/wiki/SQL_injection" target="_blank">SQL Injection</a> attacks.<br />If you really want to use this plugin, i suggest you to make a good validation and good prevention againt <a href="http://en.wikipedia.org/wiki/SQL_injection" target="_blank">SQL Injection</a> in server-side.</p>
+        
+        <!-------------------------------------------------------------------------------->
+        <!-- And here is where the magic happens, use it like a theme on your-self page -->
+        <!-------------------------------------------------------------------------------->
+        <div id="querybuilder">
+            <div class="wquerybuilder wcol-12">
+                <div class="wcol wcol-3">
+                    <fieldset>
+                        <legend>Tables</legend>
+                        <select size="18" name="wtables"></select>
+                    </fieldset>
+                </div>
+                <div class="wcol wcol-3">
+                    <fieldset>
+                        <legend>Columns</legend>
+                        <select size="18" name="wcolumns" multiple="multiple"></select>
+                    </fieldset>
+                </div>
+                <div class="wcol wcol-6">
+                    <div class="wcol wcol-6">
+                        <fieldset>
+                            <legend>Display the first</legend>
+                            <input type="number" placeholder="1000" name="wtop"/><br />
+                            <input type="radio" name="wtoptype" id="wrecords" value="1" checked="checked" /> <label for="wrecords">records</label> <br />
+                            <input type="radio" name="wtoptype" id="wpercent" value="0" /> <label for="wpercent">percent of records</label>
+                        </fieldset>
+                    </div>
+                    <div class="wcol wcol-6">
+                        <fieldset>
+                            <legend>Order by</legend>
+                            <select name="worderby"></select><br />
+                            <input type="radio" name="worderbytype" id="wasc" value="1" checked="checked"/> <label for="wasc">Ascending</label> <br />
+                            <input type="radio" name="worderbytype" id="wdesc" value="0" /> <label for="wdesc">Descending</label>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="wcol wcol-6">
+                    <fieldset>
+                        <legend>Group by</legend>
+                        <select name="wgroupby"></select><br />
+                    </fieldset>
+                </div>
+                
+                <div class="wcol wcol-6">
+                    <fieldset>
+                        <legend>Create spare column</legend>
+                        <div class="wcol wcol-12">
+                            <label>Column name</label><br />
+                            <input type="text" placeholder="Column name"/><br /><br />
+                        </div>
+                        <div class="wcol wcol-6">
+                            <fieldset class="winvisible">
+                                <label>Aggregate functions</label>
+                                <select>
+                                    <option>Day</option>
+                                    <option>Month</option>
+                                    <option>Year</option>
+                                    <option>Date</option>
+                                    <option>Year/Month</option>
+                                    <option>Count</option>
+                                    <option>Sum</option>
+                                    <option>Average</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-6">
+                            <fieldset class="winvisible">
+                                <label>Column content</label>
+                                <select name="wcolumncontent"></select>
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-12">
+                            <br />
+                            <input type="button" value="Create column" />
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="wcol wcol-12">
+                    <fieldset>
+                        <legend>Selection of records / Union tables</legend>
+                        <div class="wcol wcol-12">
+                            <fieldset class="winvisible">
+                                <input type="radio" name="union" id="wfilter" /> <label for="wfilter">Create filter</label>
+                                <input type="radio" name="union" id="wunion" /> <label for="wunion">Union tables</label>
+                                <br /><br />
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-4">
+                            <fieldset class="winvisible">
+                                <label>Column</label>
+                                <select name="wcolumnunion"></select>
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-4">
+                            <fieldset class="winvisible">
+                                <label>Operator</label>
+                                <select>
+                                    <option>=</option>
+                                    <option><></option>
+                                    <option>></option>
+                                    <option>>=</option>
+                                    <option><</option>
+                                    <option><=</option>
+                                    <option>$</option>
+                                    <option>!$</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-4">
+                            <fieldset class="winvisible">
+                                <label>Value</label><br >
+                                <input type="text"/><br />
+                            </fieldset>
+                        </div>
+                        <div class="wcol wcol-12">
+                            <br />
+                            <input type="button" value="Create" />
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="wcol wcol-12">
+                    <fieldset>
+                        <legend>SQL Result</legend>
+                        <input type="button" value="Clear all" /> <input type="button" value="Clear WHERE clause" />
+                        <textarea rows="8" disabled=disabled name="wresult">Result of created query</textarea>
+                    </fieldset>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+        <!----------------------- /And here is where the magic ends ---------------------->
+        
+		<script>
+            // Calling query builder
+			$(function() {
+                var obj = {
+                    Users: ["Id","FullName","Username","Email","Location","Country","ZIP","Phone"],
+                    Products: ["Id","Name","Type","Weight","Size","Factory","Height","Area"],
+                    Storage: ["ProductId","Qtd"],
+                };
+				$("#querybuilder").wquerybuilder({data: obj});
+			});
+		</script>
+	</body>
+</html>

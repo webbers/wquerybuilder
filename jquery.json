@@ -1,0 +1,31 @@
+{
+	"name": "jQuery WQueryBuilder",
+	"title": "jQuery WQueryBuilder",
+	"description": "jQuery Plugin to create sql queries an easy way",
+	"keywords": [
+		"jquery",
+		"boilerplate",
+		"plugins"
+	],
+	"version": "0.1.0",
+	"author": {
+		"name": "Webbers",
+		"url": "https://github.com/webbers"
+	},
+	"maintainers": [
+		{
+			"name": "Webbers",
+			"url": "https://github.com/webbers"
+		}
+	],
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://opensource.org/licenses/MIT"
+		}
+	],
+	"dependencies": {
+		"jquery": ">=1.4",
+        "squel":"=3.1.1"
+	}
+}
