@@ -60,8 +60,8 @@
                         <fieldset>
                             <legend>Order by</legend>
                             <select name="worderby"></select><br />
-                            <input type="radio" name="worderbytype" id="wasc" value="1" checked="checked"/> <label for="wasc">Ascending</label> <br />
-                            <input type="radio" name="worderbytype" id="wdesc" value="0" /> <label for="wdesc">Descending</label>
+                            <input type="radio" name="worderbytype" id="wasc" value="true" checked="checked"/> <label for="wasc">Ascending</label> <br />
+                            <input type="radio" name="worderbytype" id="wdesc" value="false" /> <label for="wdesc">Descending</label>
                         </fieldset>
                     </div>
                 </div>
@@ -77,17 +77,18 @@
                         <legend>Create spare column</legend>
                         <div class="wcol wcol-12">
                             <label>Column name</label><br />
-                            <input type="text" placeholder="Column name"/><br /><br />
+                            <input type="text" placeholder="Column name" name="wsparename"/><br /><br />
                         </div>
                         <div class="wcol wcol-6">
                             <fieldset class="winvisible">
                                 <label>Aggregate functions</label>
-                                <select>
-                                    <option>Day</option>
-                                    <option>Month</option>
-                                    <option>Year</option>
-                                    <option>Date</option>
-                                    <option>Year/Month</option>
+                                <select name="waggregate">
+                                    <option></option>
+                                    <option value="day">Day</option>
+                                    <option value="month">Month</option>
+                                    <option value="year">Year</option>
+                                    <option value="format" data-format="yyyy/mm/dd">Date</option>
+                                    <option value="format" data-format="yyyy/mm">Year/Month</option>
                                     <option>Count</option>
                                     <option>Sum</option>
                                     <option>Average</option>
@@ -102,7 +103,7 @@
                         </div>
                         <div class="wcol wcol-12">
                             <br />
-                            <input type="button" value="Create column" />
+                            <input type="button" value="Create column" name="wcreatespare" />
                         </div>
                     </fieldset>
                 </div>

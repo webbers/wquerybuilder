@@ -76,12 +76,20 @@ module.exports = function(grunt) {
                 expand: true,
                 filter: 'isFile'
             }
+        },
+        
+        'testem': {
+            options : {
+                launch_in_ci : [
+                    'chrome'
+                ]
+            },
+            main : {
+                src: [ 'SpecRunner.html' ]
+            }
         }
 
 	});
 
 	grunt.registerTask("default", ["jshint", "concat", "uglify", "copy:main", "less:main", "cssmin:minify"]);
-    grunt.registerTask("pub", ["jshint", "concat", "uglify", "copy:main", "less:main", "cssmin:minify"]);
-	grunt.registerTask("travis", ["jshint"]);
-
 };
