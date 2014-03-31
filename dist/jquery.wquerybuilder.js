@@ -15,7 +15,7 @@
     var wquery = {
         from: [],
         field: [],
-        spares: [],
+        spares: {},
         distintic: {},
         join: {},
         left_join: {},
@@ -155,7 +155,6 @@
                     content: $selectSpareColumnContent.val()
                 };
                 self._executeQuery(self.DataTypes.SPARECOLUMN, val);
-                self._cleanSpare();
             });
         },
         _renderColumnsOptions: function(data,val){
@@ -255,12 +254,6 @@
                     break;
 
                 case this.DataTypes.SPARECOLUMN:
-                    var flatVal = val.content;
-                    if (!_.isEmpty(val.aggregate)){
-                        flatVal = val.aggregate.toUpperCase() + "(" + val.content + ")";
-                    }
-                    str += ".field('" + flatVal + "','" + val.name + "')";
-                    wquery.field.push(val.content);
                     break;
 
                 default:
@@ -268,41 +261,28 @@
                     break;
             }
 
-            for (var clause in wquery) {
-                if ($.isArray(wquery[clause]) || $.type(wquery[clause]) === "number" || $.type(wquery[clause]) === "string") {
-                    if (!_.isEmpty(wquery[clause]) && _.isArray(wquery[clause])) {
-                        for (var i = 0; i < wquery[clause].length; i++){
-                            var v = _.isBoolean(wquery[clause][i]) ? wquery[clause][i] : "'" + wquery[clause][i] + "'";
-                            str += "." + clause + "(" + v + ")";
-                        }
-                    } else if (_.isString(wquery[clause])) {
-                        var splited = wquery[clause].split(",");
-                        var l = splited.length;
-                        if (l > 1) {
-                            var z = "";
-                            for (var j = 0; j < l; j++) {
-                                if (splited[j].toLowerCase() === "true" || splited[j].toLowerCase() === "false") {
-                                    z += splited[j];
-                                }
-                                else if (splited[j] !== null && splited[j] !== undefined) {
-                                    z += "'" + splited[j] + "'";
-                                }
-                                else{
-                                    continue;
-                                }
-                                if ((j + 1) !== l){
-                                    z += ",";
-                                }
-                            }
-                            str += "." + clause + "(" + z + ")";
-                        }
-                        else if (!_.isEmpty(wquery[clause])) {
-                            str += "." + clause + "('" + wquery[clause] + "')";
-                        }
-                    } else if (_.isNumber(wquery[clause])) {
-                        str += "." + clause + "('" + wquery[clause] + "')";
-                    }
+            var froms = wquery.from;
+            for (var from in froms) {
+                if (!_.isEmpty(froms[from])) {
+                    str += ".from('" + froms[from] + "')";
                 }
+            }
+
+            var fields = wquery.field;
+            for (var field in fields) {
+                if (!_.isEmpty(fields[field])) {
+                    str += ".field('" + fields[field] + "')";
+                }
+            }
+
+            var order = wquery.order;
+            if (!_.isEmpty(order)) {
+                str += ".order('" + order.split(",")[0] + "'," + order.split(",")[1] + ")";
+            }
+
+            var group = wquery.group;
+            if (!_.isEmpty(group)) {
+                str += ".group('" + group + "')";
             }
 
             $textareaQueryResult.val(eval("squel.select()" + str));
@@ -323,6 +303,7 @@
                 wquery = {
                     from: [],
                     field: [],
+                    spares: [],
                     distintic: {},
                     join: {},
                     left_join: {},
