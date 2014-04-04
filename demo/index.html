@@ -38,13 +38,13 @@
                 <div class="wcol wcol-3">
                     <fieldset>
                         <legend>Tables</legend>
-                        <select size="18" name="wtables"></select>
+                        <select size="22" name="wtables"></select>
                     </fieldset>
                 </div>
                 <div class="wcol wcol-3">
                     <fieldset>
                         <legend>Columns</legend>
-                        <select size="18" name="wcolumns" multiple="multiple"></select>
+                        <select size="22" name="wcolumns" multiple="multiple"></select>
                     </fieldset>
                 </div>
                 <div class="wcol wcol-6">
@@ -74,36 +74,53 @@
                 
                 <div class="wcol wcol-6">
                     <fieldset>
-                        <legend>Create spare column</legend>
+                        <legend>Spare column</legend>
+                        
                         <div class="wcol wcol-12">
-                            <label>Column name</label><br />
-                            <input type="text" placeholder="Column name" name="wsparename"/><br /><br />
-                        </div>
-                        <div class="wcol wcol-6">
-                            <fieldset class="winvisible">
-                                <label>Aggregate functions</label>
-                                <select name="waggregate">
-                                    <option></option>
-                                    <option value="day">Day</option>
-                                    <option value="month">Month</option>
-                                    <option value="year">Year</option>
-                                    <option value="format" data-format="yyyy/mm/dd">Date</option>
-                                    <option value="format" data-format="yyyy/mm">Year/Month</option>
-                                    <option>Count</option>
-                                    <option>Sum</option>
-                                    <option>Average</option>
-                                </select>
-                            </fieldset>
-                        </div>
-                        <div class="wcol wcol-6">
-                            <fieldset class="winvisible">
-                                <label>Column content</label>
-                                <select name="wcolumncontent"></select>
-                            </fieldset>
-                        </div>
-                        <div class="wcol wcol-12">
-                            <br />
-                            <input type="button" value="Create column" name="wcreatespare" />
+                            <div class="wcol wcol-6">
+                                <div class="wcol wcol-12">
+                                    <label>Column name</label><br />
+                                    <input type="text" placeholder="Column name" name="wsparename" />
+                                </div>
+                                <div class="wcol wcol-12">
+                                    <br />
+                                    <label>Column content</label>
+                                    <select name="wcolumncontent"></select>
+                                </div>
+                                <div class="wcol wcol-12">
+                                    <br />
+                                    <label>Aggregate functions</label>
+                                    <select name="waggregate">
+                                        <option></option>
+                                        <option value="DAY">Day</option>
+                                        <option value="MONTH">Month</option>
+                                        <option value="YEAR">Year</option>
+                                        <option value="FORMAT" data-format="yyyy/mm/dd">Date</option>
+                                        <option value="FORMAT" data-format="yyyy/mm">Year/Month</option>
+                                        <option value="COUNT">Count</option>
+                                        <option value="SUM">Sum</option>
+                                        <option value="AVERAGE">Average</option>
+                                    </select>
+                                </div>
+                                <div class="wcol wcol-12">
+                                    <br />
+                                    <input type="button" value="Create column" name="wcreatespare" />
+                                </div>
+                            </div>
+
+                            <div class="wcol wcol-6">
+                                <fieldset class="winvisible">
+                                    <div class="wcol wcol-12">
+                                        <label>Created spare columns</label>
+                                        <select size="8" name="wspares" multiple="multiple"></select>
+                                    </div>
+                                    <div class="wcol wcol-12">
+                                        <br />
+                                        <input type="button" value="Delete column" name="wdeletespare" />
+                                        <input type="button" value="Delete all" name="wdeleteallspare" class="fr"/>
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -153,7 +170,7 @@
                 <div class="wcol wcol-12">
                     <fieldset>
                         <legend>SQL Result</legend>
-                        <input type="button" value="Clear all" /> <input type="button" value="Clear WHERE clause" />
+                        <input type="button" value="Clear all" name="wclearall" /> <input type="button" value="Clear WHERE clause" />
                         <textarea rows="8" disabled=disabled name="wresult">Result of created query</textarea>
                     </fieldset>
                 </div>
