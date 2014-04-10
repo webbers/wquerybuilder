@@ -26,6 +26,7 @@ QUnit.begin(function(){
     $deleteAllFilter = $("[name='wdeletefilter']");
     $topValue = $("[name='wtop']");
     $setTop = $("[name='wsettop']");
+    $clearTop = $("[name='wcleartop']");
 });
 
 QUnit.testDone(function( details ) {
@@ -399,60 +400,60 @@ test("Should show the correct query after delete all spare columns", function ()
     ok($spares.find('option').length === 0);
 });
 
-//module("Union tests");
+module("Union tests");
 
-//test("Should show the correct query after create a union table", function () {
-//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
-//    var firstColumn = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
-//    var secondColumn = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
-//    var secondTable = secondColumn.split('.');
+test("Should show the correct query after create a union table", function () {
+    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+    var firstColumn = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+    var secondColumn = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+    var secondTable = secondColumn.split('.');
 
-//    $createUnion.trigger('click');
+    $createUnion.trigger('click');
 
-//    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0] + ' ON (' + firstColumn + ' = ' + secondColumn + ')';
-//    equal($queryResult.val(), result);
-//});
+    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0] + ' ON (' + firstColumn + ' = ' + secondColumn + ')';
+    equal($queryResult.val(), result);
+});
 
-//test("Should show the correct query after create a multiple union tables", function () {
-//    var firstColumn = [];
-//    var secondColumn = [];
-//    var secondTable = [];
+test("Should show the correct query after create a multiple union tables", function () {
+    var firstColumn = [];
+    var secondColumn = [];
+    var secondTable = [];
 
-//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
 
-//    firstColumn[0] = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
-//    secondColumn[0] = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
-//    secondTable[0] = secondColumn[0].split('.');
+    firstColumn[0] = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+    secondColumn[0] = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+    secondTable[0] = secondColumn[0].split('.');
 
-//    $createUnion.trigger('click');
+    $createUnion.trigger('click');
 
-//    firstColumn[1] = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
-//    secondColumn[1] = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
-//    secondTable[1] = secondColumn[1].split('.');
+    firstColumn[1] = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
+    secondColumn[1] = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+    secondTable[1] = secondColumn[1].split('.');
 
-//    $createUnion.trigger('click');
+    $createUnion.trigger('click');
 
-//    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0][0] + ' ON (' + firstColumn[0] + ' = ' + secondColumn[0] + ') INNER JOIN ' + secondTable[1][0] + ' ON (' + firstColumn[1] + ' = ' + secondColumn[1] + ')';
-//    equal($queryResult.val(), result);
-//});
+    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0][0] + ' ON (' + firstColumn[0] + ' = ' + secondColumn[0] + ') INNER JOIN ' + secondTable[1][0] + ' ON (' + firstColumn[1] + ' = ' + secondColumn[1] + ')';
+    equal($queryResult.val(), result);
+});
 
-//test("Should show the correct query after delete all union tables", function () {
-//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+test("Should show the correct query after delete all union tables", function () {
+    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
 
-//    $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
-//    $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+    $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+    $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
 
-//    $createUnion.trigger('click');
+    $createUnion.trigger('click');
 
-//    firstColumn = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
-//    secondColumn = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+    firstColumn = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
+    secondColumn = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
 
-//    $createUnion.trigger('click');
-//    $deleteAllUnion.trigger('click');
+    $createUnion.trigger('click');
+    $deleteAllUnion.trigger('click');
 
-//    var result = 'SELECT * FROM ' + firstTable;
-//    equal($queryResult.val(), result);
-//});
+    var result = 'SELECT * FROM ' + firstTable;
+    equal($queryResult.val(), result);
+});
 
 module("Where tests");
 
@@ -545,5 +546,24 @@ test("Should show the correct query using 'top' of MSSQL", function () {
     equal($queryResult.val(), result);
 
     $topValue.trigger('blur');
+    equal($queryResult.val(), result);
+});
+
+test("Should show the correct query without 'top'", function () {
+    $('#querybuilder').wquerybuilder("mysql");
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    $setTop.trigger('click');
+    $clearTop.trigger('click');
+    var result = 'SELECT * FROM ' + table;
+    equal($queryResult.val(), result);
+
+    $('#querybuilder').wquerybuilder("oracle");
+    $setTop.trigger('click');
+    $clearTop.trigger('click');
+    equal($queryResult.val(), result);
+
+    $('#querybuilder').wquerybuilder("mssql");
+    $setTop.trigger('click');
+    $clearTop.trigger('click');
     equal($queryResult.val(), result);
 });

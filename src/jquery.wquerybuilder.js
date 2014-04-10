@@ -41,7 +41,8 @@
         $inputValueFilter,
         $buttonCreateFilter,
         $buttonDeleteAllFilter,
-        $buttonSetTop;
+        $buttonSetTop,
+        $buttonClearTop;
 
     function Plugin(element, options) {
 
@@ -88,6 +89,7 @@
             //Display
             $inputTextTop = $(this.element).find("[name='wtop']");
             $buttonSetTop = $(this.element).find("[name='wsettop']");
+            $buttonClearTop = $(this.element).find("[name='wcleartop']");
             //Order by
             $selectboxOrderby = $(this.element).find("[name='worderby']");
             $optionOrderbyType = $(this.element).find("[name='worderbytype']");
@@ -113,7 +115,7 @@
             $buttonCreateFilter = $(this.element).find("[name='wcreatefilter']");
             $buttonDeleteAllFilter = $(this.element).find("[name='wdeletefilter']");
             //Selectbox options [Ex: Table.Column]
-            $selectboxOptionsTag = $(this.element).find("[name='worderby'],[name='wgroupby'],[name='wcolumncontent'],[name='wfirstcolumnunion'],[name='wsecondcolumnunion'],[name='wcolumnfilter']");
+            $selectboxOptionsTag = $(this.element).find("[name='worderby'],[name='wgroupby'],[name='wcolumncontent'],[name='wfirstcolumnunion'],[name='wcolumnfilter']");
             //Result
             $buttonClearAll = $(this.element).find("[name='wclearall']");
             $textareaQueryResult = $(this.element).find("[name='wresult']");
@@ -143,17 +145,8 @@
                 self._executeQuery(self.DataTypes.TABLE, val);
                 self._renderColumnsOptions(data, val);
                 self._renderOptions(data, val);
+                self._renderSecondUnionOptions(data);
                 self._renderFirstUnionOptions(data, val);
-                //var tablesUnionFirst = [];
-                //var tablesUnionSecond = [];
-                //for (var i = 0; i < wquery.union; i++) {
-                //    tablesUnionFirst.push(wquery.union[i].firstTable);
-                //    tablesUnionSecond.push(wquery.union[i].secondTable);
-                //}
-                //tablesUnionFirst = _.uniq(tablesUnionFirst);
-                //tablesUnionSecond = _.uniq(tablesUnionSecond);
-                //wquery.from = _.difference(wquery.from, tablesUnionFirst);
-                //wquery.from = _.difference(wquery.from, tablesUnionSecond);
             });
 
             $selectboxTableColumns.on("change", function () {
@@ -176,6 +169,12 @@
             $inputTextTop.on("blur", function () {
                 var val = parseInt($(this).val(), 10) || 0;
                 self._executeQuery(self.DataTypes.LIMIT, val);
+            });
+
+            $buttonClearTop.on("click", function () {
+                $inputTextTop.html("1000");
+                wquery.limit = [];
+                self._executeQuery(self.DataTypes.LIMIT, "");
             });
 
             $selectboxOrderby.on("change", function () {
@@ -240,32 +239,48 @@
                 if (_.isEmpty($optionUnionFirst.val()) || _.isEmpty($optionUnionSecond.val())) {
                     return;
                 }
-                //var val = {
-                //    firstTable: ($optionUnionFirst.val().split("."))[0],
-                //    secondTable: ($optionUnionSecond.val().split("."))[0],
-                //    firstColumn: $optionUnionFirst.val(),
-                //    secondColumn: $optionUnionSecond.val()
-                //};
-                //var unionFirst = [];
-                //var unionSecond = [];
-                //unionFirst.push(val.firstTable);
-                //unionSecond.push(val.secondTable);
-                //for (var i = 0; i < wquery.union; i++) {
-                //    unionFirst.push(wquery.union[i].firstTable);
-                //    unionSecond.push(wquery.union[i].secondTable);
-                //}
-                //unionFirst = _.uniq(unionFirst);
-                //unionSecond = _.uniq(unionSecond);
-                //wquery.from = _.difference(wquery.from, unionFirst);
-                //wquery.from = _.difference(wquery.from, unionSecond);
-                //self._executeQuery(self.DataTypes.UNION, val);
-                //$optionUnionFirst.val("");
-                //$optionUnionSecond.val("");
+                var val = {
+                    firstTable: ($optionUnionFirst.val().split("."))[0],
+                    secondTable: ($optionUnionSecond.val().split("."))[0],
+                    firstColumn: $optionUnionFirst.val(),
+                    secondColumn: $optionUnionSecond.val()
+                };
+                var unionFirst = [];
+                var unionSecond = [];
+                for (var i = 0; i < wquery.union.length; i++) {
+                    unionFirst.push(wquery.union[i].firstTable);
+                    unionSecond.push(wquery.union[i].secondTable);
+                }
+                if (_.contains(unionFirst, val.secondTable) || _.contains(unionSecond, val.secondTable)) {
+                    var auxTable = val.firstTable;
+                    var auxColumn = val.firstColumn;
+                    val.firstTable = val.secondTable;
+                    val.firstColumn = val.secondColumn;
+                    val.secondTable = auxTable;
+                    val.secondColumn = auxColumn;
+                }
+                unionFirst.push(val.firstTable);
+                unionSecond.push(val.secondTable);
+                unionFirst = _.uniq(unionFirst);
+                unionSecond = _.uniq(unionSecond);
+                wquery.from = _.difference(wquery.from, unionFirst);
+                wquery.from = _.difference(wquery.from, unionSecond);
+                self._executeQuery(self.DataTypes.UNION, val);
+                $optionUnionFirst.val("");
+                $optionUnionSecond.val("");
             });
 
             $buttonDeleteAllUnion.on("click", function () {
-                //wquery.union = [];
-                //self._executeQuery(self.DataTypes.UNION, "");
+                if (wquery.field.length > 0) {
+                    for (var field in wquery.field) {
+                        wquery.from.push(((wquery.field[field]).split("."))[0]);
+                    }
+                } else {
+                    wquery.from.push($selectboxTables.val());
+                }
+                wquery.from = _.compact(wquery.from);
+                wquery.union = [];
+                self._executeQuery(self.DataTypes.UNION, "");
             });
 
             $buttonCreateFilter.on("click", function () {
@@ -341,16 +356,16 @@
             }
             $optionUnionFirst.html(options);
         },
-        //_renderSecondUnionOptions: function (data) {
-        //    var options = "<option></option>";
-        //    for (var val in data) {
-        //        for (var key in data[val]) {
-        //            var cval = val + "." + data[val][key];
-        //            options += "<option value='" + cval + "'>" + cval + "</option>";
-        //        }
-        //    }
-        //    $optionUnionSecond.html(options);
-        //},
+        _renderSecondUnionOptions: function (data) {
+            var options = "<option></option>";
+            for (var val in data) {
+                for (var key in data[val]) {
+                    var cval = val + "." + data[val][key];
+                    options += "<option value='" + cval + "'>" + cval + "</option>";
+                }
+            }
+            $optionUnionSecond.html(options);
+        },
         _cleanSpare: function () {
             $inputTextSpare.val("");
             $optionAggregate.find("option:selected").removeAttr("selected");
@@ -365,17 +380,29 @@
             var str = "";
             switch (type) {
                 case this.DataTypes.TABLE:
-                    if (wquery.from.length <= 1 && wquery.field.length === 0) {
+                    if (wquery.from.length <= 1 && wquery.field.length === 0 && wquery.union.length === 0) {
                         wquery.from = [];
                         wquery.from.push(val);
                     }
                     break;
 
                 case this.DataTypes.COLUMN:
+                    var tablesUnion = [];
+                    for (var l = 0; l < wquery.union.length; l++) {
+                        tablesUnion.push(wquery.union[l].firstTable);
+                        tablesUnion.push(wquery.union[l].secondTable);
+                    }
+                    tablesUnion = _.uniq(tablesUnion);
+
                     if (val === null && wquery.from.length === 0) {
                         wquery.from = [];
                         wquery.from.push($selectboxTables.val());
-                        wquery.field = [];
+                        if (tablesUnion.length !== 0) {
+                            wquery.from = _.difference(wquery.from, tablesUnion);
+                            wquery.field = _.difference(wquery.field, unval);
+                        } else {
+                            wquery.field = [];
+                        }
                         break;
                     }
                     if (val === null) {
@@ -383,16 +410,26 @@
                         if (wquery.from.length === 0) {
                             wquery.from.push($selectboxTables.val());
                             wquery.field = [];
+                            if (tablesUnion.length !== 0) {
+                                wquery.from = _.difference(wquery.from, tablesUnion);
+                            }
                             break;
                         }
                     }
 
                     if (_.findWhere(wquery.from, $selectboxTables.val()) === undefined && val !== null) {
-                        wquery.from = _.union(wquery.from, $selectboxTables.val());
+                        if ((tablesUnion.length === 0) || (tablesUnion.length !== 0 && _.contains(tablesUnion, $selectboxTables.val()))) {
+                            wquery.from = _.union(wquery.from, $selectboxTables.val());
+                        }
                     }
-                    wquery.field = _.union(wquery.field, val);
-                    wquery.field = _.difference(wquery.field, unval);
-                    wquery.field = _.compact(wquery.field);
+
+                    if ((tablesUnion.length === 0) || (tablesUnion.length !== 0 && _.contains(tablesUnion, $selectboxTables.val()))) {
+                        wquery.field = _.union(wquery.field, val);
+                        wquery.field = _.difference(wquery.field, unval);
+                        wquery.field = _.compact(wquery.field);
+                    }
+
+                    wquery.from = _.difference(wquery.from, tablesUnion);
                     break;
 
                 case this.DataTypes.LIMIT:
@@ -474,8 +511,17 @@
             }
 
             var unions = wquery.union;
+            //tablesUnion = [];
+            //for (var m = 0; m < unions.length; m++) {
+            //    tablesUnion.push(unions[m].firstTable);
+            //    tablesUnion.push(unions[m].secondTable);
+            //}
+            //tablesUnion = _.uniq(tablesUnion);
+
             for (var j = 0; j < unions.length; j++) {
-                str += ".from('" + unions[j].firstTable + "')";
+                if (j === 0) {
+                    str += ".from('" + unions[j].firstTable + "')";
+                }
                 str += ".join('" + unions[j].secondTable + "', null, '" + unions[j].firstColumn + " = " + unions[j].secondColumn + "')";
             }
 
