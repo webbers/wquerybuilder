@@ -1,4 +1,5 @@
-var $tables, $columns, $queryResult, $usersTable, $productsTable, $storageTable, $orderby, $orderbyOptions, $spareName, $spareColumn, $aggregate, $spares, $createSpare, $deleteSpare, $deleteAllSpare;
+var $tables, $columns, $queryResult, $usersTable, $productsTable, $storageTable, $orderby, $orderbyOptions, $spareName, $spareColumn, $aggregate, $spares, $createSpare, $deleteSpare, $deleteAllSpare,
+    $firstColumnUnion, $secondColumnUnion, $createUnion, $deleteAllUnion, $columnFilter, $operatorType, $valueFilter, $createFilter, $deleteAllFilter, $topValue, $setTop;
 QUnit.begin(function(){
     $tables = $('[name="wtables"]');
     $columns = $("[name='wcolumns']");
@@ -14,28 +15,40 @@ QUnit.begin(function(){
     $createSpare = $("[name='wcreatespare']");
     $deleteSpare = $("[name='wdeletespare']");
     $deleteAllSpare = $("[name='wdeleteallspare']");
+    $firstColumnUnion = $("[name='wfirstcolumnunion']");
+    $secondColumnUnion = $("[name='wsecondcolumnunion']");
+    $createUnion = $("[name='wcreateunion']");
+    $deleteAllUnion = $("[name='wdeleteallunion']");
+    $columnFilter = $("[name='wcolumnfilter']");
+    $operatorType = $("[name='woperator']");
+    $valueFilter = $("[name='wvaluefilter']");
+    $createFilter = $("[name='wcreatefilter']");
+    $deleteAllFilter = $("[name='wdeletefilter']");
+    $topValue = $("[name='wtop']");
+    $setTop = $("[name='wsettop']");
 });
 
 QUnit.testDone(function( details ) {
     $('#querybuilder').wquerybuilder("clean");
 });
 
-module( "Tables and Columns tests" );
+module("Tables and Columns tests");
+
 test("Should show the correct query after select a table",function(){
     $usersTable.attr('selected','selected').trigger('change');
     var selectValue = $tables.val();
-    var result = $queryResult.val();
-    equal("SELECT * FROM " + selectValue,result);
+    var result = "SELECT * FROM " + selectValue;
+    equal($queryResult.val(), result);
     
     $productsTable.attr('selected','selected').trigger('change');
     selectValue = $tables.val();
-    result = $queryResult.val();
-    equal(result, "SELECT * FROM " + selectValue);
+    result = "SELECT * FROM " + selectValue;
+    equal($queryResult.val(), result);
     
-    $storageTable.attr('selected','selected').trigger('change');
-    result = $queryResult.val();
+    $storageTable.attr('selected','selected').trigger('change');;
     selectValue = $tables.val();
-    equal(result, "SELECT * FROM " + selectValue);
+    var result = "SELECT * FROM " + selectValue;
+    equal($queryResult.val(), result);
 });
 
 test("Should show the correct query after select and unselect columns",function(){
@@ -49,8 +62,8 @@ test("Should show the correct query after select and unselect columns",function(
     
     var table = $tables.val();
     var columns = $columns.val();
-    var result = $queryResult.val();
-    equal(result, "SELECT " + columns.toString().replace(/,/g, ', ') + " FROM " + table);
+    var result = "SELECT " + columns.toString().replace(/,/g, ', ') + " FROM " + table
+    equal($queryResult.val(), result);
     
     
     $columns.find('option:eq(0)').removeAttr('selected').trigger('change');
@@ -59,8 +72,8 @@ test("Should show the correct query after select and unselect columns",function(
     $columns.find('option:eq(3)').removeAttr('selected').trigger('change');
     $columns.find('option:eq(4)').removeAttr('selected').trigger('change');
     
-    result = $queryResult.val();
-    equal(result,"SELECT * FROM " + table);
+    result = "SELECT * FROM " + table;
+    equal($queryResult.val(), result);
 });
 
 test("Should show the correct query after select and unselect multiple tables and columns",function(){
@@ -87,9 +100,8 @@ test("Should show the correct query after select and unselect multiple tables an
     columns += "," + $columns.val();
     table += $tables.val();
     
-    var result = $queryResult.val();
-    
-    equal(result, "SELECT " + columns.toString().replace(/,/g, ', ') + " FROM " + $usersTable.text() + ", " + $productsTable.text() + ", " + $storageTable.text());
+    var result = "SELECT " + columns.toString().replace(/,/g, ', ') + " FROM " + $usersTable.text() + ", " + $productsTable.text() + ", " + $storageTable.text();
+    equal($queryResult.val(), result);
 });
 
 test("Should show the correct query after select and unselect only first column of two tables", function(){
@@ -109,17 +121,17 @@ test("Should show the correct query after select and unselect only first column 
     columns += ", " +$columns.val();
     
     
-    var result = $queryResult.val();
-    equal("SELECT " + columns + " FROM " + table,result);
+    var result = "SELECT " + columns + " FROM " + table;
+    equal($queryResult.val(), result);
     
     $columns.find('option:eq(0)').removeAttr('selected').trigger('change');
     
-    result = $queryResult.val();
-    equal(result, "SELECT " + $usersTable.text() + "." + firstColumnText + " FROM " + $usersTable.text());
+    result = "SELECT " + $usersTable.text() + "." + firstColumnText + " FROM " + $usersTable.text();
+    equal($queryResult.val(), result);
 });
 
 
-module( "Orderby tests" );
+module("Orderby tests");
 
 test("Should populate orderby selectbox after select a column",function(){
     $usersTable.attr('selected','selected').trigger('change');
@@ -162,22 +174,21 @@ test("Should show the correct query after select to order by ASC or DESC ",funct
     $orderby.find('option:eq(1)').attr('selected','selected').trigger('change');
     
     var result = "SELECT Users.Id FROM Users ORDER BY Users.Id ASC";
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     
     $('#wasc').removeAttr('checked');
     $('#wdesc').attr('checked','checked').trigger('change');
     
     result = "SELECT Users.Id FROM Users ORDER BY Users.Id DESC";
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     
     $orderby.find('option:eq(0)').attr('selected','selected').trigger('change');
     
     result = "SELECT Users.Id FROM Users"; 
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
 });
 
-
-module( "Groupby tests" );
+module("Groupby tests");
 
 test("Should populate groupby selectbox after select a column",function(){
     $usersTable.attr('selected','selected').trigger('change');
@@ -220,12 +231,12 @@ test("Should show the correct query after select to group by",function(){
     $orderby.find('option:eq(1)').attr('selected','selected').trigger('change');
     
     var result = "SELECT Users.Id FROM Users ORDER BY Users.Id ASC";
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     
     $orderby.find('option:eq(0)').attr('selected','selected').trigger('change');
     
     result = "SELECT Users.Id FROM Users"; 
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
 });
 
 module("Spare columns tests");
@@ -233,7 +244,7 @@ module("Spare columns tests");
 test("Should show the correct query after create a spare column without aggregate function", function() {
     $usersTable.attr('selected', 'selected').trigger('change');
 
-    $spareName.val('name_test');
+$spareName.val('name_test');
     var name = $spareName.val();
     $spareColumn.find('option:eq(1)').attr('selected', 'selected');
     var column = $spareColumn.val();
@@ -241,7 +252,7 @@ test("Should show the correct query after create a spare column without aggregat
     $createSpare.trigger('click');
 
     var result = 'SELECT ' + column + ' AS ' + '"' + name + '" FROM ' + $usersTable.val();
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     equal($spares.find('option').val(), column + '-' + name);
 });
 
@@ -275,7 +286,7 @@ test("Should show the correct query after create multiple spare columns without 
 
     result += ' FROM ' + $usersTable.val();
 
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     $spares.find('option').each(function(index) {
         equal($(this).val(), column[index] + '-' + name[index]);
     });
@@ -294,7 +305,7 @@ test("Should show the correct query after create a spare column with a simple ag
     $createSpare.trigger('click');
 
     var result = 'SELECT ' + agg + '(' + column + ')' + ' AS ' + '"' + name + '" FROM ' + $usersTable.val();
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
 });
 
 test("Should show the correct query after create a spare column with a format aggregate function", function () {
@@ -311,7 +322,7 @@ test("Should show the correct query after create a spare column with a format ag
     $createSpare.trigger('click');
 
     var result = "SELECT " + agg + "(" + column + ", '" + format + "')" + " AS " + '"' + name + '" FROM ' + $usersTable.val();
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
 });
 
 test("Should show the correct query after delete a spare column", function () {
@@ -325,7 +336,7 @@ test("Should show the correct query after delete a spare column", function () {
     $deleteSpare.trigger('click');
 
     var result = 'SELECT * FROM ' + $usersTable.val();
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     ok($spares.find('option').length === 0);
 });
 
@@ -360,7 +371,7 @@ test("Should show the correct query after delete multiple spare columns", functi
     $spares.find('option:eq(0), option:eq(1)').attr('selected', 'selected');
     $deleteSpare.trigger('click');
 
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     ok(!$spares.find("option[value='" + column[0] + '-' + name[0] + "']").length > 0);
     ok(!$spares.find("option[value='" + column[1] + '-' + name[1] + "']").length > 0);
     ok($spares.find("option[value='" + column[2] + '-' + name[2] + "']").length > 0);
@@ -384,6 +395,155 @@ test("Should show the correct query after delete all spare columns", function ()
     $deleteAllSpare.trigger('click');
 
     var result = 'SELECT * FROM ' + $usersTable.val();
-    equal(result, $queryResult.val());
+    equal($queryResult.val(), result);
     ok($spares.find('option').length === 0);
+});
+
+//module("Union tests");
+
+//test("Should show the correct query after create a union table", function () {
+//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+//    var firstColumn = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+//    var secondColumn = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+//    var secondTable = secondColumn.split('.');
+
+//    $createUnion.trigger('click');
+
+//    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0] + ' ON (' + firstColumn + ' = ' + secondColumn + ')';
+//    equal($queryResult.val(), result);
+//});
+
+//test("Should show the correct query after create a multiple union tables", function () {
+//    var firstColumn = [];
+//    var secondColumn = [];
+//    var secondTable = [];
+
+//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+
+//    firstColumn[0] = $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+//    secondColumn[0] = $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+//    secondTable[0] = secondColumn[0].split('.');
+
+//    $createUnion.trigger('click');
+
+//    firstColumn[1] = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
+//    secondColumn[1] = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+//    secondTable[1] = secondColumn[1].split('.');
+
+//    $createUnion.trigger('click');
+
+//    var result = 'SELECT * FROM ' + firstTable + ' INNER JOIN ' + secondTable[0][0] + ' ON (' + firstColumn[0] + ' = ' + secondColumn[0] + ') INNER JOIN ' + secondTable[1][0] + ' ON (' + firstColumn[1] + ' = ' + secondColumn[1] + ')';
+//    equal($queryResult.val(), result);
+//});
+
+//test("Should show the correct query after delete all union tables", function () {
+//    var firstTable = $storageTable.attr('selected', 'selected').trigger('change').val();
+
+//    $firstColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+//    $secondColumnUnion.find('option:eq(9)').attr('selected', 'selected').val();
+
+//    $createUnion.trigger('click');
+
+//    firstColumn = $firstColumnUnion.find('option:eq(2)').attr('selected', 'selected').val();
+//    secondColumn = $secondColumnUnion.find('option:eq(1)').attr('selected', 'selected').val();
+
+//    $createUnion.trigger('click');
+//    $deleteAllUnion.trigger('click');
+
+//    var result = 'SELECT * FROM ' + firstTable;
+//    equal($queryResult.val(), result);
+//});
+
+module("Where tests");
+
+test("Should show the correct query after create a where clause", function () {
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    var column = $columnFilter.find('option:eq(1)').attr('selected', 'selected').val();
+    var operator = $operatorType.find('option:eq(1)').attr('selected', 'selected').val();
+    var value = $valueFilter.val("2").val();
+
+    $createFilter.trigger('click');
+
+    var result = 'SELECT * FROM ' + table + ' WHERE (' + column + ' ' + operator + ' ' + value + ')';
+    equal($queryResult.val(), result);
+});
+
+test("Should show the correct query after create a multiple where clauses", function () {
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    var column = [];
+    var operator = [];
+    var value = [];
+
+    column[0] = $columnFilter.find('option:eq(1)').attr('selected', 'selected').val();
+    operator[0] = $operatorType.find('option:eq(1)').attr('selected', 'selected').val();
+    value[0] = $valueFilter.val("2").val();
+    $createFilter.trigger('click');
+
+    var result = 'SELECT * FROM ' + table + ' WHERE (' + column[0] + ' ' + operator[0] + ' ' + value[0] + ')';
+    equal($queryResult.val(), result);
+
+    column[1] = $columnFilter.find('option:eq(1)').attr('selected', 'selected').val();
+    operator[1] = $operatorType.find('option:eq(1)').attr('selected', 'selected').val();
+    value[1] = $valueFilter.val("test_string").val();
+    $createFilter.trigger('click');
+
+    result = 'SELECT * FROM ' + table + ' WHERE (' + column[0] + ' ' + operator[0] + ' ' + value[0] + ') AND (' + column[1] + ' ' + operator[1] + ' "' + value[1] + '")';
+    equal($queryResult.val(), result);
+});
+
+test("Should show the correct query after delete all where clauses", function () {
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    $columnFilter.find('option:eq(1)').attr('selected', 'selected');
+    $operatorType.find('option:eq(1)').attr('selected', 'selected');
+    $valueFilter.val("2").val();
+
+    $createFilter.trigger('click');
+    $deleteAllFilter.trigger('click');
+
+    var result = 'SELECT * FROM ' + table;
+    equal($queryResult.val(), result);
+});
+
+module("Top tests");
+
+test("Should show the correct query using 'top' of MYSQL", function () {
+    $('#querybuilder').wquerybuilder("mysql");
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    var topValue = $topValue.val();
+
+    $setTop.trigger('click');
+
+    var result = 'SELECT * FROM ' + table + ' LIMIT ' + topValue;
+    equal($queryResult.val(), result);
+
+    $topValue.trigger('blur');
+    equal($queryResult.val(), result);
+});
+
+test("Should show the correct query using 'top' of ORACLE", function () {
+    $('#querybuilder').wquerybuilder("oracle");
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    var topValue = $topValue.val();
+
+    $setTop.trigger('click');
+
+    var result = 'SELECT * FROM ' + table + ' WHERE (ROWNUM <= ' + topValue + ')';
+    equal($queryResult.val(), result);
+
+    $topValue.trigger('blur');
+    equal($queryResult.val(), result);
+});
+
+test("Should show the correct query using 'top' of MSSQL", function () {
+    $('#querybuilder').wquerybuilder("mssql");
+    var table = $usersTable.attr('selected', 'selected').trigger('change').val();
+    var topValue = $topValue.val();
+
+    $setTop.trigger('click');
+
+    var result = 'SELECT TOP ' + topValue + ' * FROM ' + table;
+    equal($queryResult.val(), result);
+
+    $topValue.trigger('blur');
+    equal($queryResult.val(), result);
 });

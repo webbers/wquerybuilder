@@ -13,7 +13,7 @@
     <!-------------------------------------------------------------------------------->
     <!-- And here is where the magic happens, use it like a theme on your-self page -->
     <!-------------------------------------------------------------------------------->
-    <div id="querybuilder">
+	<div id="querybuilder">
         <div class="wquerybuilder wcol-12">
             <div class="wcol wcol-3">
                 <fieldset>
@@ -31,9 +31,8 @@
                 <div class="wcol wcol-6">
                     <fieldset>
                         <legend>Display the first</legend>
-                        <input type="number" placeholder="1000" name="wtop" /><br />
-                        <input type="radio" name="wtoptype" id="wrecords" value="1" checked="checked" /> <label for="wrecords">records</label> <br />
-                        <input type="radio" name="wtoptype" id="wpercent" value="0" /> <label for="wpercent">percent of records</label>
+                        <input type="number" name="wtop" value="1000"/><br /><br />
+                        <input type="button" value="Set limit" name="wsettop" />
                     </fieldset>
                 </div>
                 <div class="wcol wcol-6">
@@ -106,24 +105,40 @@
             </div>
             <div class="wcol wcol-12">
                 <fieldset>
-                    <legend>Selection of records / Union tables</legend>
-                    <div class="wcol wcol-12">
+                    <legend>Union tables</legend>
+                    <div class="wcol wcol-6">
                         <fieldset class="winvisible">
-                            <input type="radio" name="union" id="wfilter" /> <label for="wfilter">Create filter</label>
-                            <input type="radio" name="union" id="wunion" /> <label for="wunion">Union tables</label>
-                            <br /><br />
+                            <label>First column</label>
+                            <select name="wfirstcolumnunion"></select>
                         </fieldset>
                     </div>
-                    <div class="wcol wcol-4">
+                    <div class="wcol wcol-6">
+                        <fieldset class="winvisible">
+                            <label>Second column</label>
+                            <select name="wsecondcolumnunion"></select>
+                        </fieldset>
+                    </div>
+                    <div class="wcol wcol-12">
+                        <br />
+                        <input type="button" value="Create" name="wcreateunion" />
+                        <input type="button" value="Delete all" name="wdeleteallunion" />
+                    </div>
+                </fieldset>
+            </div>
+            <div class="wcol wcol-12">
+                <fieldset>
+                    <legend>Filter of records</legend>
+                    <div class="wcol wcol-5">
                         <fieldset class="winvisible">
                             <label>Column</label>
-                            <select name="wcolumnunion"></select>
+                            <select name="wcolumnfilter"></select>
                         </fieldset>
                     </div>
-                    <div class="wcol wcol-4">
+                    <div class="wcol wcol-2">
                         <fieldset class="winvisible">
                             <label>Operator</label>
-                            <select>
+                            <select name="woperator">
+                                <option></option>
                                 <option>=</option>
                                 <option><></option>
                                 <option>></option>
@@ -135,22 +150,23 @@
                             </select>
                         </fieldset>
                     </div>
-                    <div class="wcol wcol-4">
+                    <div class="wcol wcol-5">
                         <fieldset class="winvisible">
                             <label>Value</label><br>
-                            <input type="text" /><br />
+                            <input type="text" name="wvaluefilter" /><br />
                         </fieldset>
                     </div>
                     <div class="wcol wcol-12">
                         <br />
-                        <input type="button" value="Create" />
+                        <input type="button" value="Create" name="wcreatefilter" />
+                        <input type="button" value="Delete all" name="wdeletefilter" />
                     </div>
                 </fieldset>
             </div>
             <div class="wcol wcol-12">
                 <fieldset>
                     <legend>SQL Result</legend>
-                    <input type="button" value="Clear all" name="wclearall" /> <input type="button" value="Clear WHERE clause" />
+                    <input type="button" value="Clear all" name="wclearall" />
                     <textarea rows="8" disabled= disabled name="wresult">Result of created query</textarea>
                 </fieldset>
             </div>

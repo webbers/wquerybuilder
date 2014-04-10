@@ -10,27 +10,25 @@
 
     var pluginName = "wquerybuilder",
         defaults = {
-            data: {}
-        };
+            data: {},
+            sqlType: "MYSQL"
+};
     var wquery = {
         from: [],
         field: [],
-        spares: [],
-        distintic: {},
-        join: {},
-        left_join: {},
-        right_join: {},
+        spare: [],
+        union: [],
+        where: [],
         group: "",
         order: "",
-        limit: 0,
-        where: {}
+        limit: ""
     };
+    var sqlType = "";
     var $selectboxTables,
         $selectboxTableColumns,
         $textareaQueryResult,
         $selectboxOptionsTag,
         $inputTextTop,
-        $optionTopType,
         $selectboxOrderby,
         $optionOrderbyType,
         $optionGroupbyType,
@@ -41,7 +39,17 @@
         $selectSpareColumnContent,
         $selectboxSpares,
         $buttonDeleteSpare,
-        $buttonDeleteAllSpare;
+        $buttonDeleteAllSpare,
+        $optionUnionFirst,
+        $optionUnionSecond,
+        $buttonCreateUnion,
+        $buttonDeleteAllUnion,
+        $optionFilter,
+        $optionOperator,
+        $inputValueFilter,
+        $buttonCreateFilter,
+        $buttonDeleteAllFilter,
+        $buttonSetTop;
 
     function Plugin(element, options) {
 
@@ -58,7 +66,9 @@
             ORDERBY: { value: "orderby" },
             UNKNOW: { value: "unknow" },
             GROUPBY: { value: "group" },
-            SPARECOLUMN: { value: "field" }
+            SPARECOLUMN: { value: "field" },
+            UNION: { value: "union" },
+            WHERE: { value: "where" }
         };
 
         this.AggregateFunctions = {
@@ -85,7 +95,7 @@
             $selectboxTableColumns = $(this.element).find("[name='wcolumns']");
             //Display
             $inputTextTop = $(this.element).find("[name='wtop']");
-            $optionTopType = $(this.element).find("[name='wtoptype']");
+            $buttonSetTop = $(this.element).find("[name='wsettop']");
             //Order by
             $selectboxOrderby = $(this.element).find("[name='worderby']");
             $optionOrderbyType = $(this.element).find("[name='worderbytype']");
@@ -99,8 +109,19 @@
             $selectboxSpares = $(this.element).find("[name='wspares']");
             $buttonDeleteSpare = $(this.element).find("[name='wdeletespare']");
             $buttonDeleteAllSpare = $(this.element).find("[name='wdeleteallspare']");
+            //Union
+            $optionUnionFirst = $(this.element).find("[name='wfirstcolumnunion']");
+            $optionUnionSecond = $(this.element).find("[name='wsecondcolumnunion']");
+            $buttonCreateUnion = $(this.element).find("[name='wcreateunion']");
+            $buttonDeleteAllUnion = $(this.element).find("[name='wdeleteallunion']");
+            //Where
+            $optionFilter = $(this.element).find("[name='wcolumnfilter']");
+            $optionOperator = $(this.element).find("[name='woperator']");
+            $inputValueFilter = $(this.element).find("[name='wvaluefilter']");
+            $buttonCreateFilter = $(this.element).find("[name='wcreatefilter']");
+            $buttonDeleteAllFilter = $(this.element).find("[name='wdeletefilter']");
             //Selectbox options [Ex: Table.Column]
-            $selectboxOptionsTag = $(this.element).find("[name='worderby'],[name='wgroupby'],[name='wcolumncontent'],[name='wcolumnunion']");
+            $selectboxOptionsTag = $(this.element).find("[name='worderby'],[name='wgroupby'],[name='wcolumncontent'],[name='wfirstcolumnunion'],[name='wsecondcolumnunion'],[name='wcolumnfilter']");
             //Result
             $buttonClearAll = $(this.element).find("[name='wclearall']");
             $textareaQueryResult = $(this.element).find("[name='wresult']");
@@ -108,9 +129,9 @@
 
             if (this.options.data) {
                 try {
+                    sqlType = this.options.sqlType;
                     this.initTables(this.options.data);
-                    this.initListeners(this.options.data);
-                    //this.methods.clean();
+                    this.initListeners(this.options.data, this.element);
                 } catch (a) {
                     alert("Error on initialize plugin");
                 }
@@ -123,13 +144,24 @@
             }
             $selectboxTables.html(options);
         },
-        initListeners: function (data) {
+        initListeners: function (data, element) {
             var self = this;
             $selectboxTables.on("change", function () {
                 var val = $(this).val();
                 self._executeQuery(self.DataTypes.TABLE, val);
                 self._renderColumnsOptions(data, val);
                 self._renderOptions(data, val);
+                self._renderFirstUnionOptions(data, val);
+                //var tablesUnionFirst = [];
+                //var tablesUnionSecond = [];
+                //for (var i = 0; i < wquery.union; i++) {
+                //    tablesUnionFirst.push(wquery.union[i].firstTable);
+                //    tablesUnionSecond.push(wquery.union[i].secondTable);
+                //}
+                //tablesUnionFirst = _.uniq(tablesUnionFirst);
+                //tablesUnionSecond = _.uniq(tablesUnionSecond);
+                //wquery.from = _.difference(wquery.from, tablesUnionFirst);
+                //wquery.from = _.difference(wquery.from, tablesUnionSecond);
             });
 
             $selectboxTableColumns.on("change", function () {
@@ -142,6 +174,16 @@
                 });
                 self._executeQuery(self.DataTypes.COLUMN, val, unval);
                 self._renderOptions(data, val);
+            });
+
+            $buttonSetTop.on("click", function () {
+                var val = parseInt($inputTextTop.val(), 10) || 0;
+                self._executeQuery(self.DataTypes.LIMIT, val);
+            });
+
+            $inputTextTop.on("blur", function () {
+                var val = parseInt($(this).val(), 10) || 0;
+                self._executeQuery(self.DataTypes.LIMIT, val);
             });
 
             $selectboxOrderby.on("change", function () {
@@ -160,11 +202,6 @@
                 }
                 var val = $selectboxOrderby.val();
                 self._executeQuery(self.DataTypes.ORDERBY, val);
-            });
-
-            $inputTextTop.on("blur", function () {
-                var val = parseInt($(this).val(), 10) || 0;
-                self._executeQuery(self.DataTypes.LIMIT, val);
             });
 
             $buttonCreateSpare.on("click", function () {
@@ -191,10 +228,10 @@
                     }
                 });
                 for (var j = 0; j < val.length; j++) {
-                    for (var k = 0; k < wquery.spares.length; k++) {
-                        var value = wquery.spares[k].content + "-" + wquery.spares[k].name;
+                    for (var k = 0; k < wquery.spare.length; k++) {
+                        var value = wquery.spare[k].content + "-" + wquery.spare[k].name;
                         if (val[j] === value) {
-                            wquery.spares.splice(wquery.spares.indexOf(wquery.spares[k]), 1);
+                            wquery.spare.splice(wquery.spare.indexOf(wquery.spare[k]), 1);
                         }
                     }
                 }
@@ -203,12 +240,64 @@
 
             $buttonDeleteAllSpare.on("click", function () {
                 $selectboxSpares.html("");
-                wquery.spares = [];
+                wquery.spare = [];
                 self._executeQuery(self.DataTypes.SPARECOLUMN, "");
             });
 
+            $buttonCreateUnion.on("click", function () {
+                if (_.isEmpty($optionUnionFirst.val()) || _.isEmpty($optionUnionSecond.val())) {
+                    return;
+                }
+                //var val = {
+                //    firstTable: ($optionUnionFirst.val().split("."))[0],
+                //    secondTable: ($optionUnionSecond.val().split("."))[0],
+                //    firstColumn: $optionUnionFirst.val(),
+                //    secondColumn: $optionUnionSecond.val()
+                //};
+                //var unionFirst = [];
+                //var unionSecond = [];
+                //unionFirst.push(val.firstTable);
+                //unionSecond.push(val.secondTable);
+                //for (var i = 0; i < wquery.union; i++) {
+                //    unionFirst.push(wquery.union[i].firstTable);
+                //    unionSecond.push(wquery.union[i].secondTable);
+                //}
+                //unionFirst = _.uniq(unionFirst);
+                //unionSecond = _.uniq(unionSecond);
+                //wquery.from = _.difference(wquery.from, unionFirst);
+                //wquery.from = _.difference(wquery.from, unionSecond);
+                //self._executeQuery(self.DataTypes.UNION, val);
+                //$optionUnionFirst.val("");
+                //$optionUnionSecond.val("");
+            });
+
+            $buttonDeleteAllUnion.on("click", function () {
+                //wquery.union = [];
+                //self._executeQuery(self.DataTypes.UNION, "");
+            });
+
+            $buttonCreateFilter.on("click", function () {
+                if (_.isEmpty($optionFilter.val()) || _.isEmpty($optionOperator.val()) || $inputValueFilter.val() === "") {
+                    return;
+                }
+                var val = {
+                    column: $optionFilter.val(),
+                    operator: $optionOperator.val(),
+                    value: $inputValueFilter.val()
+                };
+                self._executeQuery(self.DataTypes.WHERE, val);
+                $optionFilter.val("");
+                $optionOperator.find("option:eq(0)").attr("selected", "selected");
+                $inputValueFilter.val("");
+            });
+
+            $buttonDeleteAllFilter.on("click", function () {
+                wquery.where = [];
+                self._executeQuery(self.DataTypes.WHERE, "");
+            });
+
             $buttonClearAll.on("click", function () {
-                self._methods.clean();
+                self.methods.clean(element);
             });
         },
         _renderColumnsOptions: function (data, val) {
@@ -247,11 +336,29 @@
         },
         _renderOptionsSpares: function () {
             var options = "";
-            for (var j = 0; j < wquery.spares.length; j++) {
-                options += "<option value='" + wquery.spares[j].content + "-" + wquery.spares[j].name + "'>" + wquery.spares[j].content + " ( " + wquery.spares[j].name + " )</option>";
+            for (var j = 0; j < wquery.spare.length; j++) {
+                options += "<option value='" + wquery.spare[j].content + "-" + wquery.spare[j].name + "'>" + wquery.spare[j].content + " ( " + wquery.spare[j].name + " )</option>";
             }
             $selectboxSpares.html(options);
         },
+        _renderFirstUnionOptions: function (data, val) {
+            var options = "<option></option>";
+            for (var key in data[val]) {
+                var cval = val + "." + data[val][key];
+                options += "<option value='" + cval + "'>" + cval + "</option>";
+            }
+            $optionUnionFirst.html(options);
+        },
+        //_renderSecondUnionOptions: function (data) {
+        //    var options = "<option></option>";
+        //    for (var val in data) {
+        //        for (var key in data[val]) {
+        //            var cval = val + "." + data[val][key];
+        //            options += "<option value='" + cval + "'>" + cval + "</option>";
+        //        }
+        //    }
+        //    $optionUnionSecond.html(options);
+        //},
         _cleanSpare: function () {
             $inputTextSpare.val("");
             $optionAggregate.find("option:selected").removeAttr("selected");
@@ -316,7 +423,19 @@
 
                 case this.DataTypes.SPARECOLUMN:
                     if (!_.isEmpty(val)) {
-                        wquery.spares = _.union(wquery.spares, val);
+                        wquery.spare = _.union(wquery.spare, val);
+                    }
+                    break;
+
+                case this.DataTypes.UNION:
+                    if (!_.isEmpty(val)) {
+                        wquery.union = _.union(wquery.union, val);
+                    }
+                    break;
+
+                case this.DataTypes.WHERE:
+                    if (!_.isEmpty(val)) {
+                        wquery.where = _.union(wquery.where, val);
                     }
                     break;
 
@@ -339,7 +458,7 @@
                 }
             }
 
-            var spares = wquery.spares;
+            var spares = wquery.spare;
             for (var i = 0; i < spares.length; i++) {
                 if (_.isEmpty(spares[i].aggregate)) {
                     str += ".field('" + spares[i].content + "', '" + spares[i].name + "')";
@@ -362,11 +481,43 @@
                 str += ".group('" + group + "')";
             }
 
-            $textareaQueryResult.val(eval("squel.select()" + str));
+            var unions = wquery.union;
+            for (var j = 0; j < unions.length; j++) {
+                str += ".from('" + unions[j].firstTable + "')";
+                str += ".join('" + unions[j].secondTable + "', null, '" + unions[j].firstColumn + " = " + unions[j].secondColumn + "')";
+            }
+
+            var filters = wquery.where;
+            for (var k = 0; k < filters.length; k++) {
+                var value = parseInt(filters[k].value, 10) || "\"" + filters[k].value + "\"";
+                str += ".where('" + filters[k].column + " " + filters[k].operator + " " + value + "')";
+            }
+
+            var result = "";
+            if (wquery.limit === "") {
+                result = eval("squel.select()" + str);
+            } else {
+                if (sqlType === "MSSQL") {
+                    var top = "SELECT TOP " + wquery.limit;
+                    result = eval("squel.select()" + str).toString();
+                    result = result.replace("SELECT", top);
+                } else if (sqlType === "ORACLE") {
+                    str += ".where('ROWNUM <= " + wquery.limit + "')";
+                    result = eval("squel.select()" + str);
+                } else if (sqlType === "MYSQL") {
+                    str += ".limit(" + wquery.limit + ")";
+                    result = eval("squel.select()" + str);
+                }
+            }
+
+            $textareaQueryResult.val(result);
         },
         methods: {
-            clean: function (self, element) {
+            clean: function (element) {
                 $selectboxTableColumns.html("");
+                $selectboxSpares.html("");
+                $selectboxOptionsTag.html("");
+                $optionUnionSecond.html("");
 
                 $(element).find("input, textarea, select")
                  .not("[type='button'], [type='submit'], [type='reset'], [type='hidden'], [type='radio']")
@@ -380,16 +531,22 @@
                 wquery = {
                     from: [],
                     field: [],
-                    spares: [],
-                    distintic: {},
-                    join: {},
-                    left_join: {},
-                    right_join: {},
-                    group: {},
-                    order: null,
-                    limit: 0,
-                    where: {}
+                    spare: [],
+                    union: [],
+                    where: [],
+                    group: "",
+                    order: "",
+                    limit: ""
                 };
+            },
+            mysql: function() {
+                sqlType = "MYSQL";
+            },
+            mssql: function () {
+                sqlType = "MSSQL";
+            },
+            oracle: function () {
+                sqlType = "ORACLE";
             }
         }
     };
