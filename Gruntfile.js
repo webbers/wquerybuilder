@@ -92,4 +92,5 @@ module.exports = function(grunt) {
 	});
 
 	grunt.registerTask("default", ["jshint", "concat", "uglify", "copy:main", "less:main", "cssmin:minify"]);
+    grunt.registerTask("test", ["default"]);
 };
