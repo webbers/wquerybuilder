@@ -12,7 +12,7 @@
         defaults = {
             data: {},
             sqlType: "MYSQL"
-};
+        };
     var wquery = {
         from: [],
         field: [],
@@ -418,6 +418,7 @@
                         if (wquery.from.length === 0) {
                             wquery.from.push($selectboxTables.val());
                             wquery.field = [];
+                            wquery.field = _;
                             if (tablesUnion.length !== 0) {
                                 wquery.from = _.difference(wquery.from, tablesUnion);
                             }
@@ -519,13 +520,6 @@
             }
 
             var unions = wquery.union;
-            //tablesUnion = [];
-            //for (var m = 0; m < unions.length; m++) {
-            //    tablesUnion.push(unions[m].firstTable);
-            //    tablesUnion.push(unions[m].secondTable);
-            //}
-            //tablesUnion = _.uniq(tablesUnion);
-
             for (var j = 0; j < unions.length; j++) {
                 if (j === 0) {
                     str += ".from('" + unions[j].firstTable + "')";
