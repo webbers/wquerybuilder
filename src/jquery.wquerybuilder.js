@@ -410,7 +410,6 @@
                         if (wquery.from.length === 0) {
                             wquery.from.push($selectboxTables.val());
                             wquery.field = [];
-                            wquery.field = _;
                             if (tablesUnion.length !== 0) {
                                 wquery.from = _.difference(wquery.from, tablesUnion);
                             }
