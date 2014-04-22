@@ -1,5 +1,6 @@
 var $tables, $columns, $queryResult, $usersTable, $productsTable, $storageTable, $orderby, $orderbyOptions, $spareName, $spareColumn, $aggregate, $spares, $createSpare, $deleteSpare, $deleteAllSpare,
     $firstColumnUnion, $secondColumnUnion, $createUnion, $deleteAllUnion, $columnFilter, $operatorType, $valueFilter, $createFilter, $deleteAllFilter, $topValue, $setTop;
+
 QUnit.begin(function(){
     $tables = $('[name="wtables"]');
     $columns = $("[name='wcolumns']");
@@ -227,6 +228,8 @@ test("Should populate groupby selectbox after select a column of two types of ta
 
 test("Should show the correct query after select to group by",function(){
     $usersTable.attr('selected','selected').trigger('change');
+    $("#wasc").trigger('click');
+    
     $columns.find('option:eq(0)').attr('selected','selected').trigger('change');
     
     $orderby.find('option:eq(1)').attr('selected','selected').trigger('change');
