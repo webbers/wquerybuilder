@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/webbers/wquerybuilder.svg?branch=master)](https://travis-ci.org/webbers/wquerybuilder)
 # WQueryBuilder
-A good alternative to create SQL strings using a browser
+A good alternative to create SQL strings using a browser, you can see a demo here: [DEMO](http://renanborges.com/wquerybuilder/demo/)
 
 ## Features
 
