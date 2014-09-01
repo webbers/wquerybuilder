@@ -10,3 +10,9 @@ A good alternative to create SQL strings using a browser, you can see a demo her
 * Support MySql and Postgre
 * Chrome, Firefox and IE8+ Support
 * Easy to configure
+
+## Next features
+
+* Remove Underscore depency
+* Support for MSSQL
+* Support for Oracle
