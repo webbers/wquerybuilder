@@ -1,5 +1,5 @@
 /*
- *  jQuery WQueryBuilder - v0.1.0
+ *  jQuery WQueryBuilder - v0.1.1
  *  jQuery Plugin to create sql queries an easy way
  *  
  *
