@@ -6,31 +6,6 @@
  *  Made by Webbers
  *  Under MIT License
  */
-function difference(a1, a2) {
-    var d1 = $(a1).not(a2).get();
-    return d1;
-}
-function uniq(a1){
-    return a1.filter(function(item, pos) {
-        return a1.indexOf(item) === pos;
-    });
-}
-function compact(a1){
-    return $.grep(a1, function(n){
-        return (n !== "" && n !== null);
-    });
-}
-function union(a1, a2){
-    var arr = a1.concat(a2);
-    return arr.filter(function (item, pos) {return arr.indexOf(item) === pos;});
-}
-function findWhere(a1, match){
-    var index = a1.indexOf(match);
-    if(index > -1){
-        return a1[index];
-    }
-    return undefined;
-}
 (function ($, window, document, undefined) {
 
     var pluginName = "wquerybuilder",
@@ -76,6 +51,32 @@ function findWhere(a1, match){
         $buttonDeleteAllFilter,
         $buttonSetTop,
         $buttonClearTop;
+
+    function difference(a1, a2) {
+        var d1 = $(a1).not(a2).get();
+        return d1;
+    }
+    function uniq(a1){
+        return a1.filter(function(item, pos) {
+            return a1.indexOf(item) === pos;
+        });
+    }
+    function compact(a1){
+        return $.grep(a1, function(n){
+            return (n !== "" && n !== null);
+        });
+    }
+    function union(a1, a2){
+        var arr = a1.concat(a2);
+        return arr.filter(function (item, pos) {return arr.indexOf(item) === pos;});
+    }
+    function findWhere(a1, match){
+        var index = a1.indexOf(match);
+        if(index > -1){
+            return a1[index];
+        }
+        return undefined;
+    }
 
     function Plugin(element, options) {
 
