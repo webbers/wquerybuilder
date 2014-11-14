@@ -1,5 +1,5 @@
 /*
- *  jQuery WQueryBuilder - v0.1.1
+ *  jQuery WQueryBuilder - v0.1.2
  *  jQuery Plugin to create sql queries an easy way
  *  
  *
@@ -222,7 +222,7 @@
             });
 
             $optionOrderbyType.on("change", function () {
-                if ($selectboxOrderby.val() === "" || $selectboxOrderby.val() === null) {
+                if (!$selectboxOrderby.val()) {
                     return;
                 }
                 var val = $selectboxOrderby.val();
@@ -270,7 +270,7 @@
             });
 
             $buttonCreateUnion.on("click", function () {
-                if ($.isEmptyObject($optionUnionFirst.val()) || $.isEmptyObject($optionUnionSecond.val())) {
+                if (!$optionUnionFirst.val() || !$optionUnionSecond.val()) {
                     return;
                 }
                 var val = {
@@ -320,7 +320,7 @@
             });
 
             $buttonCreateFilter.on("click", function () {
-                if ($.isEmptyObject($optionFilter.val()) || $.isEmptyObject($optionOperator.val()) || $inputValueFilter.val() === "") {
+                if (!$optionFilter.val() || !$optionOperator.val() || !$inputValueFilter.val()) {
                     return;
                 }
                 var val = {
@@ -488,19 +488,19 @@
                     break;
 
                 case this.DataTypes.SPARECOLUMN:
-                    if (!$.isEmptyObject(val)) {
+                    if ((typeof val === "string" && !!val.length) || (typeof val === "object" && !$.isEmptyObject(val))) {
                         wquery.spare = union(wquery.spare, val);
                     }
                     break;
 
                 case this.DataTypes.UNION:
-                    if (!$.isEmptyObject(val)) {
+                    if ((typeof val === "string" && !!val.length) || (typeof val === "object" && !$.isEmptyObject(val))) {
                         wquery.union = union(wquery.union, val);
                     }
                     break;
 
                 case this.DataTypes.WHERE:
-                    if (!$.isEmptyObject(val)) {
+                    if ((typeof val === "string" && !!val.length) || (typeof val === "object" && !$.isEmptyObject(val))) {
                         wquery.where = union(wquery.where, val);
                     }
                     break;
@@ -512,24 +512,24 @@
 
             var froms = wquery.from;
             for (var from in froms) {
-                if (!$.isEmptyObject(froms[from])) {
+                if (!$.isEmptyObject(froms[from]) || !!froms[from].length) {
                     str += ".from('" + froms[from] + "')";
                 }
             }
 
             var fields = wquery.field;
             for (var field in fields) {
-                if (!$.isEmptyObject(fields[field])) {
+                if (!$.isEmptyObject(fields[field])|| !!fields[field].length) {
                     str += ".field('" + fields[field] + "')";
                 }
             }
 
             var spares = wquery.spare;
             for (var i = 0; i < spares.length; i++) {
-                if ($.isEmptyObject(spares[i].aggregate)) {
+                if ($.isEmptyObject(spares[i].aggregate) || !spares[i].aggregate.length) {
                     str += ".field('" + spares[i].content + "', '" + spares[i].name + "')";
                 } else {
-                    if (!$.isEmptyObject(spares[i].format)) {
+                    if (!$.isEmptyObject(spares[i].format) || (!!spares[i].format && !!spares[i].format.length)) {
                         str += ".field(\"" + spares[i].aggregate + "(" + spares[i].content + ", '" + spares[i].format + "')\", '" + spares[i].name + "')";
                     } else {
                         str += ".field('" + spares[i].aggregate + "(" + spares[i].content + ")', '" + spares[i].name + "')";
@@ -538,12 +538,12 @@
             }
 
             var order = wquery.order;
-            if (!$.isEmptyObject(order)) {
+            if (typeof order === "string" && !!order.length) {
                 str += ".order('" + order.split(",")[0] + "'," + order.split(",")[1] + ")";
             }
 
             var group = wquery.group;
-            if (!$.isEmptyObject(group)) {
+            if (typeof group === "string" && !!group.length) {
                 str += ".group('" + group + "')";
             }
 

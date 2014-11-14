@@ -4,7 +4,7 @@
   "description": "jQuery Plugin to create sql queries an easy way",
   "author": "Webbers",
   "homepage": "https://github.com/webbers/",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.7",
