@@ -6,7 +6,7 @@ A good alternative to create SQL strings using a browser, you can see a demo her
 
 * Use [Jquery](https://github.com/jquery/jquery)
 * Use [Squeljs](https://github.com/hiddentao/squel)
-* Support MySql and Postgre
+* Support MySql, Postgre, Oracle and MSSQL
 * Chrome, Firefox and IE8+ Support
 * Easy to configure
 
@@ -14,8 +14,6 @@ A good alternative to create SQL strings using a browser, you can see a demo her
 
 * Bootstrap theme
 * Support for Delete syntax
-* Support for MSSQL
-* Support for Oracle
 
 ## Last updates
 
